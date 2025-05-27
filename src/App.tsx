@@ -4,7 +4,8 @@ import Rectangle from "./component/Rectangle";
 function App() {
   return (
     <>
-      <Rectangle />
+      <Rectangle id={1} />
+      <Rectangle id={2} />
     </>
   )
 }
