@@ -10,13 +10,11 @@ import {
 import { getRandomColor, getRandomInt } from "../../utils.ts";
 import { minHeight, minWidth } from "./constant.ts";
 import styles from './index.module.css';
-import type { Corner, RectState, ResizeRef } from "./types.ts";
+import type { DragRef, Corner, RectState, ResizeRef } from "./types.ts";
 
 type RectangleProps = {
   id: number;
 } & Partial<Omit<RectState, 'id'>>;
-
-const backgroundColor = getRandomColor();
 
 const Rectangle = ({
   id,
@@ -29,17 +27,20 @@ const Rectangle = ({
     x: getRandomInt(100, 200),
     y: getRandomInt(100, 200),
     selected: false,
+    backgroundColor: getRandomColor(),
     ...initialRect,
   })
 
   const rectRef = useRef<HTMLDivElement>(null);
-  const resizeRef = useRef<ResizeRef | null>(null)
+  const resizeRef = useRef<ResizeRef | null>(null);
+  const dragRef = useRef<DragRef | null>(null);
 
 
   const onMouseUp = () => {
     resizeRef.current = null;
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mousemove', onDrag);
   };
 
 
@@ -98,6 +99,30 @@ const Rectangle = ({
     })
   }
 
+
+  const onMouseDownDrag = (e: ReactMouseEvent) => {
+    dragRef.current = {
+      x: rect.x,
+      y: rect.y,
+      px: e.clientX,
+      py: e.clientY,
+    }
+
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+
+  const onDrag = (e: globalThis.MouseEvent) => {
+    if(!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.px;
+    const dy = e.clientY - dragRef.current.py;
+    setRect((prevRect) => ({
+      ...prevRect,
+      x: dragRef.current!.x + dx,
+      y: dragRef.current!.y + dy
+    }));
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (rectRef.current && !rectRef.current.contains(event.target as Node)) {
@@ -122,10 +147,11 @@ const Rectangle = ({
         left: `${rect.x}px`,
         width: `${rect.width}px`,
         height: `${rect.height}px`,
-        backgroundColor: backgroundColor,
+        backgroundColor: rect.backgroundColor,
         zIndex: id,
       }}
       onClick={() => setRect(prev => ({ ...prev, selected: true }))}
+      onMouseDown={onMouseDownDrag}
     >
       <div
         className={clsx(styles.pointer, styles.topLeftPointer)}

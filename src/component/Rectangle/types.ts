@@ -5,6 +5,7 @@ export type RectState = {
   x: number;
   y: number;
   selected: boolean;
+  backgroundColor: string;
 }
 
 export type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -18,4 +19,11 @@ export type ResizeRef = {
   py: number;
   width: number;
   height: number;
+}
+
+export type DragRef = {
+  x: number;
+  y: number;
+  px: number;
+  py: number;
 }
