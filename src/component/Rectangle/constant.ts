@@ -1,7 +1,3 @@
-const minWidth = 50;
-const minHeight = 50;
+export const minWidth = 50;
+export const minHeight = 50;
 
-export {
-  minHeight,
-  minWidth
-}

@@ -12,7 +12,7 @@
   font-weight: 600;
 }
 
-.selectedReectangle {
+.selectecRectangle {
   border-color: blue;
 }
 
@@ -27,29 +27,29 @@
   background-color: blue;
 }
 
-.selectedReectangle .pointer {
+.selectecRectangle .pointer {
   opacity: 1;
 }
 
-.pointer_topLeft {
+.topLeftPointer {
   top: -5px;
   left: -5px;
   cursor: nwse-resize;
 }
 
-.pointer_topRight {
+.topRightPointer {
   top: -5px;
   right: -5px;
   cursor: nesw-resize;
 }
 
-.pointer_bottomLeft {
+.bottomLeftPointer {
   bottom: -5px;
   left: -5px;
   cursor: nesw-resize;
 }
 
-.pointer_bottomRight {
+.bottomRightPointer {
   bottom: -5px;
   right: -5px;
   cursor: nwse-resize;
