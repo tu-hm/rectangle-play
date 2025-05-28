@@ -30,10 +30,11 @@ const Rectangle = ({
     height: getRandomInt(100, 200),
     x: getRandomInt(100, 200),
     y: getRandomInt(100, 200),
-    selected: false,
     backgroundColor: getRandomColor(),
     ...initialRect,
   })
+
+  const [selected, setSelected] = useState(false);
 
   const rectRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<ResizeRef | null>(null);
@@ -124,20 +125,21 @@ const Rectangle = ({
   }
 
   const onDrag = (e: globalThis.MouseEvent) => {
-    if(!dragRef.current) return;
-    const dx = e.clientX - dragRef.current.px;
-    const dy = e.clientY - dragRef.current.py;
+    const drag = dragRef.current;
+    if(!drag) return;
+    const dx = e.clientX - drag.px;
+    const dy = e.clientY - drag.py;
     setRect((prevRect) => ({
       ...prevRect,
-      x: dragRef.current!.x + dx,
-      y: dragRef.current!.y + dy
+      x: drag.x + dx,
+      y: drag.y + dy
     }));
   }
 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (rectRef.current && !rectRef.current.contains(event.target as Node)) {
-        setRect(prev => ({ ...prev, selected: false }));
+        setSelected(false);
       }
     };
 
@@ -150,7 +152,7 @@ const Rectangle = ({
   return (
     <div
       className={
-        clsx(styles.rectangle, rect.selected && styles.selectecRectangle)
+        clsx(styles.rectangle, selected && styles.selectecRectangle)
       }
       ref={rectRef}
       style={{
@@ -161,7 +163,7 @@ const Rectangle = ({
         backgroundColor: rect.backgroundColor,
         zIndex: id,
       }}
-      onClick={() => setRect(prev => ({ ...prev, selected: true }))}
+      onClick={() => setSelected(prev => !prev)}
       onMouseDown={onMouseDownDrag}
     >
       <div

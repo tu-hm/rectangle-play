@@ -4,7 +4,6 @@ export type RectState = {
   height: number;
   x: number;
   y: number;
-  selected: boolean;
   backgroundColor: string;
 }
 
