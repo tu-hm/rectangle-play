@@ -1,0 +1,57 @@
+.rectangle {
+  position: absolute;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  cursor: move;
+  transition: border 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.selectecRectangle {
+  border-color: blue;
+}
+
+.pointer {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background-color: blue;
+}
+
+.selectecRectangle .pointer {
+  opacity: 1;
+}
+
+.topLeftPointer {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.topRightPointer {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.bottomLeftPointer {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.bottomRightPointer {
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}
+
