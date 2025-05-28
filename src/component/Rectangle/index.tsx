@@ -8,9 +8,9 @@ import {
 
 
 import { getRandomColor, getRandomInt } from "../../utils.ts";
-import { minHeight, minWidth } from "./constant.ts";
+import { minHeight, minWidth } from "../../constant.ts";
 import styles from './index.module.css';
-import type { DragRef, Corner, RectState, ResizeRef } from "./types.ts";
+import type { DragRef, Corner, RectState, ResizeRef } from "../../types.ts";
 
 type RectangleProps = {
   id: number;
