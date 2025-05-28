@@ -14,10 +14,14 @@ import type { DragRef, Corner, RectState, ResizeRef } from "./types.ts";
 
 type RectangleProps = {
   id: number;
+  handleResizeEnd?: () => void,
+  handleDragEnd?: () => void,
 } & Partial<Omit<RectState, 'id'>>;
 
 const Rectangle = ({
   id,
+  handleDragEnd = (() => {}),
+  handleResizeEnd = (() => {}),
   ...initialRect
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
@@ -37,7 +41,14 @@ const Rectangle = ({
 
 
   const onMouseUp = () => {
+    const isResize = resizeRef !== null;
+    const isDrag = dragRef !== null;
+
+    if (isResize) handleResizeEnd();
+    if (isDrag) handleDragEnd();
+
     resizeRef.current = null;
+    dragRef.current = null;
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', onMouseUp);
     document.removeEventListener('mousemove', onDrag);
