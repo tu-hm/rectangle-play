@@ -1,0 +1,51 @@
+.buttonList {
+  display: flex;
+  gap: 12px;    
+  flex-direction: column;    
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 0 64px;
+  border-right: 1px solid black;
+}
+
+.buttonGeneral {
+  padding: 10px 20px;
+  background-color: #1e40af; 
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.buttonGeneral:hover {
+  transform: translateY(-2px);
+}
+
+.buttonGeneral:active {
+  transform: translateY(0);
+}
+
+.buttonGeneral:focus {
+  outline: 2px dotted black;
+  outline-offset: 2px;
+}
+
+.createButton {
+  background-color: blue;
+}
+
+.deleteButton {
+  background-color: red;
+}
+
+.undoButton {
+  background-color: purple;
+}
+
+.redoButton {
+  background-color: green;
+}

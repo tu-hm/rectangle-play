@@ -14,14 +14,16 @@ import type { DragRef, Corner, RectState, ResizeRef } from "../../types.ts";
 
 type RectangleProps = {
   id: number;
-  handleResizeEnd?: () => void,
-  handleDragEnd?: () => void,
+  handleResizeEnd?: (item: RectState) => void,
+  handleDragEnd?: (item: RectState) => void,
+  handleSelected?: (id: number) => void,
 } & Partial<Omit<RectState, 'id'>>;
 
 const Rectangle = ({
   id,
   handleDragEnd = (() => {}),
   handleResizeEnd = (() => {}),
+  handleSelected = (() => {}),
   ...initialRect
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
@@ -45,8 +47,8 @@ const Rectangle = ({
     const isResize = resizeRef !== null;
     const isDrag = dragRef !== null;
 
-    if (isResize) handleResizeEnd();
-    if (isDrag) handleDragEnd();
+    if (isResize) handleResizeEnd(rect);
+    if (isDrag) handleDragEnd(rect);
 
     resizeRef.current = null;
     dragRef.current = null;
@@ -163,7 +165,12 @@ const Rectangle = ({
         backgroundColor: rect.backgroundColor,
         zIndex: id,
       }}
-      onClick={() => setSelected(prev => !prev)}
+      onClick={() => {
+        setSelected(prev => !prev)
+        if(selected) {
+          handleSelected(id);
+        }
+      }}
       onMouseDown={onMouseDownDrag}
     >
       <div

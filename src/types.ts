@@ -26,3 +26,20 @@ export type DragRef = {
   px: number;
   py: number;
 }
+
+type ActionType = "append" | "remove" | "update";
+
+export type Action = {
+  type: ActionType;
+  item: RectState;
+}
+
+export type HistoryData = {
+  past: Action[];
+  future: Action[];
+}
+
+export type RectangleData = {
+  rect: RectState[];
+  history: HistoryData;
+}
