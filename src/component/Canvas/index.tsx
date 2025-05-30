@@ -1,20 +1,32 @@
-import useRectangleStore from "../../store/rectangleStore";
+import { useEffect, useState } from "react";
+
+import type { RectState } from "../../types";
 import Rectangle from "../Rectangle";
+import styles from './index.module.css';
+import useRectangleStore from "../../store/rectangleStore";
 
 type CanvasProps = {
+  rectangle: RectState[];
   onSelectId: (id: number) => void;
 }
 
 const Canvas = ({
-  onSelectId
+  rectangle,
+  onSelectId,
 } : CanvasProps) => {
-  const { rectData, update: updateRect } = useRectangleStore();
+  const [rectangleState, setRectangleState] = useState<RectState[]>(rectangle);
+  const { update: updateRect } = useRectangleStore();
+
+  useEffect(() => {
+    setRectangleState(rectangle);
+  }, [rectangle])
 
   return (
-    <div>
+    <div className={styles.canvas}>
       {
-        rectData.rect.map((item) => (
+        rectangleState.map((item) => (
           <Rectangle 
+            key={item.id}
             id={item.id}
             width={item.width}
             height={item.height}
