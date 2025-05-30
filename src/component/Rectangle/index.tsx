@@ -24,9 +24,9 @@ const Rectangle = ({
   width,
   height,
   backgroundColor,
-  handleDragEnd = () => {},
-  handleResizeEnd = () => {},
-  handleSelected = () => {},
+  handleDragEnd = () => { },
+  handleResizeEnd = () => { },
+  handleSelected = () => { },
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
     id,
@@ -41,14 +41,15 @@ const Rectangle = ({
   const rectRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<ResizeRef | null>(null);
   const dragRef = useRef<DragRef | null>(null);
+  const curRectRef = useRef<RectState>(rect);
 
 
   const onMouseUp = () => {
     const isResize = resizeRef.current !== null;
     const isDrag = dragRef.current !== null;
 
-    if (isResize) handleResizeEnd(rect);
-    if (isDrag) handleDragEnd(rect);
+    if (isResize) handleResizeEnd(curRectRef.current);
+    if (isDrag) handleDragEnd(curRectRef.current);
 
     resizeRef.current = null;
     dragRef.current = null;
@@ -109,8 +110,10 @@ const Rectangle = ({
         newRect.y = y + dy;
       }
 
+      curRectRef.current = newRect;
+
       return newRect;
-    })
+    });
   }
 
 
@@ -128,15 +131,34 @@ const Rectangle = ({
 
   const onDrag = (e: globalThis.MouseEvent) => {
     const drag = dragRef.current;
-    if(!drag) return;
+    if (!drag) return;
     const dx = e.clientX - drag.px;
     const dy = e.clientY - drag.py;
-    setRect((prevRect) => ({
-      ...prevRect,
-      x: drag.x + dx,
-      y: drag.y + dy
-    }));
+    setRect((prevRect) => {
+      const newRect = {
+        ...prevRect,
+        x: drag.x + dx,
+        y: drag.y + dy
+      };
+      curRectRef.current = newRect;
+      return newRect;
+    });
   }
+
+  useEffect(() => {
+    setRect({
+      id,
+      x,
+      y,
+      width,
+      height,
+      backgroundColor,
+    });
+  }, [id, x, y, width, height, backgroundColor]);
+
+  useEffect(() => {
+    curRectRef.current = rect;
+  }, [rect]);
 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {

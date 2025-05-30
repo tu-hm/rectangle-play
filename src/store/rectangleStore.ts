@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Action, RectangleData, RectState } from "../types";
+import type { Action, RectangleData, RectState } from "../types"; 
 
 interface RectangleStore {
   rectData: RectangleData;
@@ -30,8 +30,8 @@ function reverseAction(action: Action, currentRect: RectState[]): Action {
     case "remove":
       return { type: "append", item: action.item };
     case "update": {
-      const prev = currentRect.find((r) => r.id === action.item.id);
-      return prev ? { type: "update", item: prev } : action;
+      const currentItem = currentRect.find((r) => r.id === action.item.id);
+      return currentItem ? { type: "update", item: currentItem } : action;
     }
     default:
       return action; 
@@ -56,7 +56,7 @@ const useRectangleStore = create<RectangleStore>((set) => ({
           rect: applyAction(rect, action),
           history: {
             past: [...history.past, action],
-            future: [], 
+            future: [],
           },
         },
       };
@@ -66,18 +66,16 @@ const useRectangleStore = create<RectangleStore>((set) => ({
   remove: (id) => {
     set((state) => {
       const { rect, history } = state.rectData;
-      console.log(rect)
-      const existing = rect.find((r) => r.id === id);
-      console.log("hehe");
-      if (!existing) return state;
+      const itemToRemove = rect.find((r) => r.id === id);
+      if (!itemToRemove) return state; 
 
-      const action: Action = { type: "remove", item: existing };
+      const action: Action = { type: "remove", item: itemToRemove };
       return {
         rectData: {
           rect: applyAction(rect, action),
           history: {
             past: [...history.past, action],
-            future: [], 
+            future: [],
           },
         },
       };
@@ -87,16 +85,20 @@ const useRectangleStore = create<RectangleStore>((set) => ({
   update: (item) => {
     set((state) => {
       const { rect, history } = state.rectData;
-      const prev = rect.find((r) => r.id === item.id);
-      if (!prev) return state;
+      const prevItem = rect.find((r) => r.id === item.id);
+      if (!prevItem) return state; 
 
-      const action: Action = { type: "update", item: prev };
+
+      const forwardAction: Action = { type: "update", item: item };
+
+      const actionForHistory: Action = { type: "update", item: prevItem };
+
       return {
         rectData: {
-          rect: rect.map((value) => (value.id === item.id ? item : value)),
+          rect: applyAction(rect, forwardAction), 
           history: {
-            past: [...history.past, action],
-            future: [], 
+            past: [...history.past, actionForHistory], 
+            future: [],
           },
         },
       };
@@ -108,17 +110,36 @@ const useRectangleStore = create<RectangleStore>((set) => ({
       const { rect, history } = state.rectData;
       if (history.past.length === 0) return state;
 
-      const past = [...history.past];
-      const lastAction = past.pop()!;
-      
-      const reverseActionToApply = reverseAction(lastAction, rect);
+      const newPast = [...history.past];
+      const prevAction = newPast.pop()!;
+
+      let action: Action;
+      let futureAction: Action; 
+
+      switch (prevAction.type) {
+        case "update":
+          action = prevAction;
+          const item = rect.find(r => r.id === prevAction.item.id)!;
+          futureAction = { type: "update", item: item };
+          break;
+        case "append":
+          action = reverseAction(prevAction, rect);
+          futureAction = prevAction;
+          break;
+        case "remove":
+          action = reverseAction(prevAction, rect);
+          futureAction = prevAction;
+          break;
+        default:
+          return state;
+      }
 
       return {
         rectData: {
-          rect: applyAction(rect, reverseActionToApply),
+          rect: applyAction(rect, action),
           history: {
-            past,
-            future: [lastAction, ...history.future],
+            past: newPast,
+            future: [futureAction, ...history.future],
           },
         },
       };
@@ -130,15 +151,30 @@ const useRectangleStore = create<RectangleStore>((set) => ({
       const { rect, history } = state.rectData;
       if (history.future.length === 0) return state;
 
-      const future = [...history.future];
-      const actionToRedo = future.shift()!;
+      const newFuture = [...history.future];
+      const action = newFuture.shift()!;
+
+      let prevAction: Action;
+
+      switch (action.type) {
+        case "update":
+          const prevItem = rect.find(r => r.id === action.item.id)!;
+          prevAction = { type: "update", item: prevItem };
+          break;
+        case "append":
+        case "remove":
+          prevAction = action;
+          break;
+        default:
+          return state; 
+      }
 
       return {
         rectData: {
-          rect: applyAction(rect, actionToRedo),
+          rect: applyAction(rect, action), 
           history: {
-            past: [...history.past, actionToRedo],
-            future,
+            past: [...history.past, prevAction],
+            future: newFuture,
           },
         },
       };
