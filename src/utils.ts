@@ -14,7 +14,7 @@ export const getRandomColor = (): string => {
 };
 
 export const generateRectangle = (id?: number): RectState => ({
-  id: id || getRandomInt(DEFAULT_ID_MIN, DEFAULT_ID_MAX),
+  id: id ?? getRandomInt(DEFAULT_ID_MIN, DEFAULT_ID_MAX),
   x: getRandomInt(POSITION_MIN, POSITION_MAX),
   y: getRandomInt(POSITION_MIN, POSITION_MAX),
   width: getRandomInt(SIZE_MIN, SIZE_MAX),

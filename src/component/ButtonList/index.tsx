@@ -35,14 +35,14 @@ const ButtonList = ({
         Delete
       </button>
       <button 
-        className={clsx(styles.buttonGeneral, styles.redoButton)} 
+        className={clsx(styles.buttonGeneral, styles.undoButton)} 
         disabled={canNotUndo} 
         onClick={onUndo}
       >
         Undo
       </button>
       <button 
-        className={clsx(styles.buttonGeneral, styles.undoButton)} 
+        className={clsx(styles.buttonGeneral, styles.redoButton)} 
         disabled={canNotRedo} 
         onClick={onRedo}
       >

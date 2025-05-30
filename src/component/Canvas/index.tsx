@@ -1,9 +1,11 @@
+import type { Dispatch, SetStateAction } from 'react';
+
 import useRectangleStore from '../../store/rectangleStore';
 import Rectangle from "../Rectangle";
 import styles from './index.module.css';
 
 type CanvasProps = {
-  onSelectId: (id: number) => void;
+  onSelectId: Dispatch<SetStateAction<number | null>>
 }
 
 const Canvas = ({ onSelectId }: CanvasProps) => {

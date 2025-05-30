@@ -23,21 +23,6 @@ const applyAction = (rect: RectState[], action: Action): RectState[] => {
   }
 };
 
-function reverseAction(action: Action, currentRect: RectState[]): Action {
-  switch (action.type) {
-    case "append":
-      return { type: "remove", item: action.item };
-    case "remove":
-      return { type: "append", item: action.item };
-    case "update": {
-      const currentItem = currentRect.find((r) => r.id === action.item.id);
-      return currentItem ? { type: "update", item: currentItem } : action;
-    }
-    default:
-      return action; 
-  }
-}
-
 const useRectangleStore = create<RectangleStore>((set) => ({
   rectData: {
     rect: [],
@@ -123,11 +108,11 @@ const useRectangleStore = create<RectangleStore>((set) => ({
           futureAction = { type: "update", item: item };
           break;
         case "append":
-          action = reverseAction(prevAction, rect);
+          action = { type: "remove", item: prevAction.item };
           futureAction = prevAction;
           break;
         case "remove":
-          action = reverseAction(prevAction, rect);
+          action = { type: "append", item: prevAction.item };
           futureAction = prevAction;
           break;
         default:
@@ -168,7 +153,7 @@ const useRectangleStore = create<RectangleStore>((set) => ({
         default:
           return state; 
       }
-
+      
       return {
         rectData: {
           rect: applyAction(rect, action), 
