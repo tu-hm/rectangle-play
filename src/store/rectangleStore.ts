@@ -33,6 +33,8 @@ function reverseAction(action: Action, currentRect: RectState[]): Action {
       const prev = currentRect.find((r) => r.id === action.item.id);
       return prev ? { type: "update", item: prev } : action;
     }
+    default:
+      return action; 
   }
 }
 
@@ -54,7 +56,7 @@ const useRectangleStore = create<RectangleStore>((set) => ({
           rect: applyAction(rect, action),
           history: {
             past: [...history.past, action],
-            future: [],
+            future: [], 
           },
         },
       };
@@ -64,7 +66,9 @@ const useRectangleStore = create<RectangleStore>((set) => ({
   remove: (id) => {
     set((state) => {
       const { rect, history } = state.rectData;
+      console.log(rect)
       const existing = rect.find((r) => r.id === id);
+      console.log("hehe");
       if (!existing) return state;
 
       const action: Action = { type: "remove", item: existing };
@@ -73,7 +77,7 @@ const useRectangleStore = create<RectangleStore>((set) => ({
           rect: applyAction(rect, action),
           history: {
             past: [...history.past, action],
-            future: [],
+            future: [], 
           },
         },
       };
@@ -86,13 +90,13 @@ const useRectangleStore = create<RectangleStore>((set) => ({
       const prev = rect.find((r) => r.id === item.id);
       if (!prev) return state;
 
-      const action: Action = { type: "update", item };
+      const action: Action = { type: "update", item: prev };
       return {
         rectData: {
-          rect: applyAction(rect, action),
+          rect: rect.map((value) => (value.id === item.id ? item : value)),
           history: {
             past: [...history.past, action],
-            future: [],
+            future: [], 
           },
         },
       };
@@ -102,17 +106,19 @@ const useRectangleStore = create<RectangleStore>((set) => ({
   undo: () => {
     set((state) => {
       const { rect, history } = state.rectData;
-      const past = [...history.past];
-      const action = past.pop();
-      if (!action) return state;
+      if (history.past.length === 0) return state;
 
-      const reverse = reverseAction(action, rect);
+      const past = [...history.past];
+      const lastAction = past.pop()!;
+      
+      const reverseActionToApply = reverseAction(lastAction, rect);
+
       return {
         rectData: {
-          rect: applyAction(rect, reverse),
+          rect: applyAction(rect, reverseActionToApply),
           history: {
             past,
-            future: [action, ...history.future],
+            future: [lastAction, ...history.future],
           },
         },
       };
@@ -122,15 +128,16 @@ const useRectangleStore = create<RectangleStore>((set) => ({
   redo: () => {
     set((state) => {
       const { rect, history } = state.rectData;
+      if (history.future.length === 0) return state;
+
       const future = [...history.future];
-      const action = future.shift();
-      if (!action) return state;
+      const actionToRedo = future.shift()!;
 
       return {
         rectData: {
-          rect: applyAction(rect, action),
+          rect: applyAction(rect, actionToRedo),
           history: {
-            past: [...history.past, action],
+            past: [...history.past, actionToRedo],
             future,
           },
         },

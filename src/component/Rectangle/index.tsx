@@ -44,8 +44,8 @@ const Rectangle = ({
 
 
   const onMouseUp = () => {
-    const isResize = resizeRef !== null;
-    const isDrag = dragRef !== null;
+    const isResize = resizeRef.current !== null;
+    const isDrag = dragRef.current !== null;
 
     if (isResize) handleResizeEnd(rect);
     if (isDrag) handleDragEnd(rect);
@@ -53,8 +53,8 @@ const Rectangle = ({
     resizeRef.current = null;
     dragRef.current = null;
     document.removeEventListener('mousemove', onResize);
-    document.removeEventListener('mouseup', onMouseUp);
     document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onMouseUp);
   };
 
 
@@ -151,6 +151,17 @@ const Rectangle = ({
     };
   }, [])
 
+  useEffect(() => {
+    setRect({
+      id,
+      width: initialRect.width ?? rect.width,
+      height: initialRect.height ?? rect.height,
+      x: initialRect.x ?? rect.x,
+      y: initialRect.y ?? rect.y,
+      backgroundColor: initialRect.backgroundColor ?? rect.backgroundColor,
+    });
+  }, [initialRect.width, initialRect.height, initialRect.x, initialRect.y, initialRect.backgroundColor]);
+
   return (
     <div
       className={
@@ -166,10 +177,8 @@ const Rectangle = ({
         zIndex: id,
       }}
       onClick={() => {
-        setSelected(prev => !prev)
-        if(selected) {
-          handleSelected(id);
-        }
+        setSelected(prev => !prev);
+        handleSelected(id);
       }}
       onMouseDown={onMouseDownDrag}
     >

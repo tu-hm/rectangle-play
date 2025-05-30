@@ -8,7 +8,6 @@ import { generateRectangle } from "../../utils";
 
 const Playground = () => {
   const { 
-    rectData,
     append: appendRect, 
     remove: removeRect, 
     undo: undoRect, 
@@ -39,7 +38,7 @@ const Playground = () => {
         onUndo={undoRect}
         onRedo={redoRect}
       />
-      <Canvas onSelectId={setSelectId} rectangle={rectData.rect}/>
+      <Canvas onSelectId={setSelectId}/>
     </div>
   )
 }
