@@ -1,5 +1,5 @@
 
-import useRectangleStore from "../../store/rectangleStore";
+import useRectangleStore from '../../store/rectangleStore';
 import Rectangle from "../Rectangle";
 import styles from './index.module.css';
 
@@ -10,7 +10,11 @@ type CanvasProps = {
 const Canvas = ({
   onSelectId,
 } : CanvasProps) => {
-  const { rectData, update: updateRect } = useRectangleStore();
+  const rectData  = useRectangleStore((state) => state.rectData);
+  const updateRect = useRectangleStore((state) => state.update);
+
+  console.log(rectData.rect)
+  console.log(rectData.history)
 
   return (
     <div className={styles.canvas}>

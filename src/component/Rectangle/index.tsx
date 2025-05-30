@@ -7,35 +7,35 @@ import {
 } from "react";
 
 
-import { getRandomColor, getRandomInt } from "../../utils.ts";
 import { minHeight, minWidth } from "../../constant.ts";
+import type { Corner, DragRef, RectState, ResizeRef } from "../../types.ts";
 import styles from './index.module.css';
-import type { DragRef, Corner, RectState, ResizeRef } from "../../types.ts";
 
-type RectangleProps = {
-  id: number;
-  handleResizeEnd?: (item: RectState) => void,
-  handleDragEnd?: (item: RectState) => void,
-  handleSelected?: (id: number) => void,
-} & Partial<Omit<RectState, 'id'>>;
+type RectangleProps = RectState & {
+  handleResizeEnd?: (item: RectState) => void;
+  handleDragEnd?: (item: RectState) => void;
+  handleSelected?: (id: number) => void;
+};
 
 const Rectangle = ({
   id,
-  handleDragEnd = (() => {}),
-  handleResizeEnd = (() => {}),
-  handleSelected = (() => {}),
-  ...initialRect
+  x,
+  y,
+  width,
+  height,
+  backgroundColor,
+  handleDragEnd = () => {},
+  handleResizeEnd = () => {},
+  handleSelected = () => {},
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
     id,
-    width: getRandomInt(100, 200),
-    height: getRandomInt(100, 200),
-    x: getRandomInt(100, 200),
-    y: getRandomInt(100, 200),
-    backgroundColor: getRandomColor(),
-    ...initialRect,
-  })
-
+    x,
+    y,
+    width,
+    height,
+    backgroundColor,
+  });
   const [selected, setSelected] = useState(false);
 
   const rectRef = useRef<HTMLDivElement>(null);
@@ -150,17 +150,6 @@ const Rectangle = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [])
-
-  useEffect(() => {
-    setRect({
-      id,
-      width: initialRect.width ?? rect.width,
-      height: initialRect.height ?? rect.height,
-      x: initialRect.x ?? rect.x,
-      y: initialRect.y ?? rect.y,
-      backgroundColor: initialRect.backgroundColor ?? rect.backgroundColor,
-    });
-  }, [initialRect.width, initialRect.height, initialRect.x, initialRect.y, initialRect.backgroundColor]);
 
   return (
     <div

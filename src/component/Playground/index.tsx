@@ -7,12 +7,10 @@ import styles from './index.module.css';
 import { generateRectangle } from "../../utils";
 
 const Playground = () => {
-  const { 
-    append: appendRect, 
-    remove: removeRect, 
-    undo: undoRect, 
-    redo: redoRect
-  } = useRectangleStore();
+  const appendRect = useRectangleStore((state) => state.append);
+  const removeRect = useRectangleStore((state) => state.remove);
+  const undoRect = useRectangleStore((state) => state.undo);
+  const redoRect = useRectangleStore((state) => state.redo);
 
   const [selectId, setSelectId] = useState<number | null>(null);
   const totalRect = useRef(0);
