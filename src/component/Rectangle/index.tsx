@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import { minHeight, minWidth } from "../../constant.ts";
+import { MIN_HEIGHT, MIN_WIDTH } from "../../constant.ts";
 import type { Corner, DragRef, RectState, ResizeRef } from "../../types.ts";
 import styles from './index.module.css';
 
@@ -96,17 +96,17 @@ const Rectangle = ({
       const newRect = { ...prevRect };
 
       if (corner.includes('right')) {
-        newRect.width = Math.max(minWidth, width + dx);
+        newRect.width = Math.max(MIN_WIDTH, width + dx);
       }
       if (corner.includes('bottom')) {
-        newRect.height = Math.max(minHeight, height + dy);
+        newRect.height = Math.max(MIN_HEIGHT, height + dy);
       }
       if (corner.includes('left')) {
-        newRect.width = Math.max(minWidth, width - dx);
+        newRect.width = Math.max(MIN_WIDTH, width - dx);
         newRect.x = x + dx;
       }
       if (corner.includes('top')) {
-        newRect.height = Math.max(minHeight, height - dy);
+        newRect.height = Math.max(MIN_HEIGHT, height - dy);
         newRect.y = y + dy;
       }
 
@@ -155,11 +155,7 @@ const Rectangle = ({
       backgroundColor,
     });
   }, [id, x, y, width, height, backgroundColor]);
-
-  useEffect(() => {
-    curRectRef.current = rect;
-  }, [rect]);
-
+  
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (rectRef.current && !rectRef.current.contains(event.target as Node)) {

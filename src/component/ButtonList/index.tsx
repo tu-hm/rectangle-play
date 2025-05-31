@@ -17,8 +17,8 @@ const ButtonList = ({
   onRedo,
 }: ButtonListProp) => {
   const { rectData } = useRectangleStore();
-  const canNotUndo = rectData.history.past.length === 0;
-  const canNotRedo = rectData.history.future.length === 0;
+  const canUndo = rectData.history.past.length !== 0;
+  const canRedo = rectData.history.future.length !== 0;
 
   return (
     <div className={styles.buttonList}>
@@ -36,14 +36,14 @@ const ButtonList = ({
       </button>
       <button 
         className={clsx(styles.buttonGeneral, styles.undoButton)} 
-        disabled={canNotUndo} 
+        disabled={!canUndo} 
         onClick={onUndo}
       >
         Undo
       </button>
       <button 
         className={clsx(styles.buttonGeneral, styles.redoButton)} 
-        disabled={canNotRedo} 
+        disabled={!canRedo} 
         onClick={onRedo}
       >
         Redo

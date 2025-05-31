@@ -1,5 +1,5 @@
-export const minWidth = 50;
-export const minHeight = 50;
+export const MIN_WIDTH = 50;
+export const MIN_HEIGHT = 50;
 
 export const DEFAULT_ID_MIN = 1;
 export const DEFAULT_ID_MAX = 1000;
