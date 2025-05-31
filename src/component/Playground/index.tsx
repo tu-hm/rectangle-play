@@ -1,17 +1,17 @@
-import { useRef, useState } from "react";
+import { useRef, useState } from 'react';
 
-import useRectangleStore from "../../store/rectangleStore";
-import ButtonList from "../ButtonList";
-import Canvas from "../Canvas";
+import useRectangleStore from '../../store/rectangleStore';
+import ButtonList from '../ButtonList';
+import Canvas from '../Canvas';
 import styles from './index.module.css';
-import { generateRectangle } from "../../utils";
+import { generateRectangle } from '../../utils';
 
 const Playground = () => {
   const {
-    append: appendRect, 
-    remove: removeRect, 
-    undo: undoRect, 
-    redo: redoRect 
+    append: appendRect,
+    remove: removeRect,
+    undo: undoRect,
+    redo: redoRect,
   } = useRectangleStore();
 
   const [selectId, setSelectId] = useState<number | null>(null);
@@ -22,13 +22,13 @@ const Playground = () => {
     const newRectId = totalRect.current;
     const newRect = generateRectangle(newRectId);
     appendRect(newRect);
-  }
+  };
 
   const onDelete = () => {
     if (selectId === null) return;
     removeRect(selectId);
     setSelectId(null);
-  }
+  };
 
   return (
     <div className={styles.playground}>
@@ -40,7 +40,7 @@ const Playground = () => {
       />
       <Canvas onSelectId={setSelectId} />
     </div>
-  )
-}
+  );
+};
 
 export default Playground;

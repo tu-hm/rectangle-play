@@ -2,9 +2,7 @@ import './App.css';
 import Playground from './component/Playground';
 
 function App() {
-  return (
-    <Playground />
-  )
+  return <Playground />;
 }
 
-export default App
+export default App;

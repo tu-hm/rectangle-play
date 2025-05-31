@@ -1,0 +1,31 @@
+.buttonGeneral {
+  padding: 10px 20px;
+  background-color: #1e40af; 
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.buttonGeneral:hover {
+  transform: translateY(-2px);
+}
+
+.buttonGeneral:active {
+  transform: translateY(0);
+}
+
+.buttonGeneral:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.buttonGeneral:focus {
+  outline: 2px dotted black;
+  outline-offset: 2px;
+}

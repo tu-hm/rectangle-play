@@ -1,20 +1,19 @@
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 import {
   useEffect,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent
-} from "react";
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 
-
-import { MIN_HEIGHT, MIN_WIDTH } from "../../constant.ts";
-import type { Corner, DragRef, RectState, ResizeRef } from "../../types.ts";
+import { MIN_HEIGHT, MIN_WIDTH } from '../../constant.ts';
+import type { Corner, DragRef, RectState, ResizeRef } from '../../types.ts';
 import styles from './index.module.css';
 
 type RectangleProps = RectState & {
-  handleResizeEnd?: (item: RectState) => void;
-  handleDragEnd?: (item: RectState) => void;
-  handleSelected?: (id: number) => void;
+  handleResizeEnd?: (item: RectState) => void,
+  handleDragEnd?: (item: RectState) => void,
+  handleSelected?: (id: number) => void,
 };
 
 const Rectangle = ({
@@ -24,9 +23,9 @@ const Rectangle = ({
   width,
   height,
   backgroundColor,
-  handleDragEnd = () => { },
-  handleResizeEnd = () => { },
-  handleSelected = () => { },
+  handleDragEnd = () => {},
+  handleResizeEnd = () => {},
+  handleSelected = () => {},
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
     id,
@@ -43,7 +42,6 @@ const Rectangle = ({
   const dragRef = useRef<DragRef | null>(null);
   const curRectRef = useRef<RectState>(rect);
 
-
   const onMouseUp = () => {
     const isResize = resizeRef.current !== null;
     const isDrag = dragRef.current !== null;
@@ -58,7 +56,6 @@ const Rectangle = ({
     document.removeEventListener('mouseup', onMouseUp);
   };
 
-
   const onMouseDownResize = (e: ReactMouseEvent, corner: Corner) => {
     e.stopPropagation();
     e.preventDefault();
@@ -72,23 +69,15 @@ const Rectangle = ({
       height: rect.height,
       px: e.clientX,
       py: e.clientY,
-    }
+    };
 
     document.addEventListener('mousemove', onResize);
     document.addEventListener('mouseup', onMouseUp);
-  }
+  };
 
   const onResize = (e: globalThis.MouseEvent) => {
     if (!resizeRef.current) return;
-    const {
-      corner,
-      x,
-      y,
-      px,
-      py,
-      width,
-      height
-    } = resizeRef.current;
+    const { corner, x, y, px, py, width, height } = resizeRef.current;
     const dx = e.clientX - px;
     const dy = e.clientY - py;
 
@@ -114,8 +103,7 @@ const Rectangle = ({
 
       return newRect;
     });
-  }
-
+  };
 
   const onMouseDownDrag = (e: ReactMouseEvent) => {
     dragRef.current = {
@@ -123,11 +111,11 @@ const Rectangle = ({
       y: rect.y,
       px: e.clientX,
       py: e.clientY,
-    }
+    };
 
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', onMouseUp);
-  }
+  };
 
   const onDrag = (e: globalThis.MouseEvent) => {
     const drag = dragRef.current;
@@ -138,12 +126,12 @@ const Rectangle = ({
       const newRect = {
         ...prevRect,
         x: drag.x + dx,
-        y: drag.y + dy
+        y: drag.y + dy,
       };
       curRectRef.current = newRect;
       return newRect;
     });
-  }
+  };
 
   useEffect(() => {
     setRect({
@@ -155,7 +143,7 @@ const Rectangle = ({
       backgroundColor,
     });
   }, [id, x, y, width, height, backgroundColor]);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (rectRef.current && !rectRef.current.contains(event.target as Node)) {
@@ -167,13 +155,11 @@ const Rectangle = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [])
+  }, []);
 
   return (
     <div
-      className={
-        clsx(styles.rectangle, selected && styles.selectecRectangle)
-      }
+      className={clsx(styles.rectangle, selected && styles.selectecRectangle)}
       ref={rectRef}
       style={{
         top: `${rect.y}px`,
@@ -184,7 +170,7 @@ const Rectangle = ({
         zIndex: id,
       }}
       onClick={() => {
-        setSelected(prev => !prev);
+        setSelected((prev) => !prev);
         handleSelected(id);
       }}
       onMouseDown={onMouseDownDrag}
@@ -208,7 +194,7 @@ const Rectangle = ({
 
       {id}
     </div>
-  )
-}
+  );
+};
 
 export default Rectangle;

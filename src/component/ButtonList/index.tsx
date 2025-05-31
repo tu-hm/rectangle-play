@@ -1,55 +1,43 @@
-import clsx from 'clsx';
-
-import styles from './index.module.css'
 import useRectangleStore from '../../store/rectangleStore';
+import Button from './Button';
+import styles from './index.module.css';
 
-type ButtonListProp = {
+interface ButtonListProp {
   onCreate: () => void;
   onDelete: () => void;
   onUndo: () => void;
   onRedo: () => void;
 }
 
-const ButtonList = ({
-  onCreate,
-  onDelete,
-  onUndo,
-  onRedo,
-}: ButtonListProp) => {
+const ButtonList = ({ onCreate, onDelete, onUndo, onRedo }: ButtonListProp) => {
   const { rectData } = useRectangleStore();
-  const canUndo = rectData.history.past.length !== 0;
-  const canRedo = rectData.history.future.length !== 0;
+  const canUndo = rectData.historyIndex !== 0;
+  const canRedo = rectData.historyIndex !== rectData.history.length;
 
   return (
     <div className={styles.buttonList}>
-      <button
-        className={clsx(styles.buttonGeneral, styles.createButton)}
-        onClick={onCreate}
-      >
+      <Button className={styles.createButton} onClick={onCreate}>
         Create
-      </button>
-      <button 
-        className={clsx(styles.buttonGeneral, styles.deleteButton)} 
-        onClick={onDelete}
-      >
+      </Button>
+      <Button className={styles.deleteButton} onClick={onDelete}>
         Delete
-      </button>
-      <button 
-        className={clsx(styles.buttonGeneral, styles.undoButton)} 
-        disabled={!canUndo} 
+      </Button>
+      <Button
+        className={styles.undoButton}
         onClick={onUndo}
+        disabled={!canUndo}
       >
         Undo
-      </button>
-      <button 
-        className={clsx(styles.buttonGeneral, styles.redoButton)} 
-        disabled={!canRedo} 
+      </Button>
+      <Button
+        className={styles.redoButton}
         onClick={onRedo}
+        disabled={!canRedo}
       >
         Redo
-      </button>
+      </Button>
     </div>
-  )
-}
+  );
+};
 
 export default ButtonList;
