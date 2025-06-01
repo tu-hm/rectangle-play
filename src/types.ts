@@ -38,7 +38,7 @@ export type Action =
   | { type: 'update', payload: UpdateActionPayload };
 
 export type RectangleData = {
-  rect: RectState[],
+  rect: Map<number, RectState>,
   history: Action[],
   historyIndex: number,
 };

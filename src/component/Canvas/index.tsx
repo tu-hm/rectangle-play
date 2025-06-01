@@ -9,12 +9,14 @@ type CanvasProps = {
 };
 
 const Canvas = ({ onSelectId }: CanvasProps) => {
-  const rectList = useRectangleStore((state) => state.rectData.rect);
+  const rectMap = useRectangleStore((state) => state.rectData.rect);
   const updateRect = useRectangleStore((state) => state.update);
+
+  const rectArray = Array.from(rectMap.values());
 
   return (
     <div className={styles.canvas}>
-      {rectList.map((item) => (
+      {rectArray.map((item) => (
         <Rectangle
           key={item.id}
           {...item}

@@ -41,16 +41,18 @@ const Rectangle = ({
   const resizeRef = useRef<ResizeRef | null>(null);
   const dragRef = useRef<DragRef | null>(null);
   const curRectRef = useRef<RectState>(rect);
+  const movedRef = useRef(false);
 
   const onMouseUp = () => {
-    const isResize = resizeRef.current !== null;
-    const isDrag = dragRef.current !== null;
+    const isResize = resizeRef.current !== null && movedRef.current;
+    const isDrag = dragRef.current !== null && movedRef.current;
 
     if (isResize) handleResizeEnd(curRectRef.current);
-    if (isDrag) handleDragEnd(curRectRef.current);
+    else if (isDrag) handleDragEnd(curRectRef.current);
 
     resizeRef.current = null;
     dragRef.current = null;
+    movedRef.current = false;
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', onMouseUp);
@@ -70,6 +72,7 @@ const Rectangle = ({
       px: e.clientX,
       py: e.clientY,
     };
+    movedRef.current = false;
 
     document.addEventListener('mousemove', onResize);
     document.addEventListener('mouseup', onMouseUp);
@@ -81,6 +84,8 @@ const Rectangle = ({
     const dx = e.clientX - px;
     const dy = e.clientY - py;
 
+    if (dx !== 0 || dy !== 0) movedRef.current = true;
+
     setRect((prevRect) => {
       const newRect = { ...prevRect };
 
@@ -91,12 +96,25 @@ const Rectangle = ({
         newRect.height = Math.max(MIN_HEIGHT, height + dy);
       }
       if (corner.includes('left')) {
-        newRect.width = Math.max(MIN_WIDTH, width - dx);
-        newRect.x = x + dx;
+        const calculatedWidth = width - dx;
+
+        if (calculatedWidth < MIN_WIDTH) {
+          newRect.width = MIN_WIDTH;
+          newRect.x = x + width - MIN_WIDTH;
+        } else {
+          newRect.width = calculatedWidth;
+          newRect.x = x + dx;
+        }
       }
       if (corner.includes('top')) {
-        newRect.height = Math.max(MIN_HEIGHT, height - dy);
-        newRect.y = y + dy;
+        const calculatedHeight = height - dy;
+        if (calculatedHeight < MIN_HEIGHT) {
+          newRect.height = MIN_HEIGHT;
+          newRect.y = y + height - MIN_HEIGHT;
+        } else {
+          newRect.height = calculatedHeight;
+          newRect.y = y + dy;
+        }
       }
 
       curRectRef.current = newRect;
@@ -120,8 +138,12 @@ const Rectangle = ({
   const onDrag = (e: globalThis.MouseEvent) => {
     const drag = dragRef.current;
     if (!drag) return;
+    
     const dx = e.clientX - drag.px;
     const dy = e.clientY - drag.py;
+
+    if (dx !== 0 || dy !== 0) movedRef.current = true;
+
     setRect((prevRect) => {
       const newRect = {
         ...prevRect,
@@ -134,19 +156,18 @@ const Rectangle = ({
   };
 
   useEffect(() => {
-    setRect({
-      id,
-      x,
-      y,
-      width,
-      height,
-      backgroundColor,
-    });
+    const newRect = { id, x, y, width, height, backgroundColor };
+    setRect(newRect);
+    curRectRef.current = newRect;
   }, [id, x, y, width, height, backgroundColor]);
 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
-      if (rectRef.current && !rectRef.current.contains(event.target as Node)) {
+      if (
+        rectRef.current &&
+        !rectRef.current.contains(event.target as Node) &&
+        selected
+      ) {
         setSelected(false);
       }
     };
@@ -170,8 +191,10 @@ const Rectangle = ({
         zIndex: id,
       }}
       onClick={() => {
-        setSelected((prev) => !prev);
-        handleSelected(id);
+        if (!movedRef.current && !dragRef.current && !resizeRef.current) {
+          setSelected((prev) => !prev);
+          handleSelected(id);
+        }
       }}
       onMouseDown={onMouseDownDrag}
     >
@@ -180,16 +203,16 @@ const Rectangle = ({
         onMouseDown={(e) => onMouseDownResize(e, 'top-left')}
       />
       <div
+        className={clsx(styles.pointer, styles.topRightPointer)}
+        onMouseDown={(e) => onMouseDownResize(e, 'top-right')}
+      />
+      <div
         className={clsx(styles.pointer, styles.bottomLeftPointer)}
         onMouseDown={(e) => onMouseDownResize(e, 'bottom-left')}
       />
       <div
         className={clsx(styles.pointer, styles.bottomRightPointer)}
         onMouseDown={(e) => onMouseDownResize(e, 'bottom-right')}
-      />
-      <div
-        className={clsx(styles.pointer, styles.topRightPointer)}
-        onMouseDown={(e) => onMouseDownResize(e, 'top-right')}
       />
 
       {id}
