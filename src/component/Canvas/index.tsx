@@ -1,16 +1,13 @@
-import type { Dispatch, SetStateAction } from 'react';
-
 import useRectangleStore from '../../store/rectangleStore';
 import Rectangle from '../Rectangle';
 import styles from './index.module.css';
 
-type CanvasProps = {
-  onSelectId: Dispatch<SetStateAction<number | null>>,
-};
 
-const Canvas = ({ onSelectId }: CanvasProps) => {
+const Canvas = () => {
   const rectMap = useRectangleStore((state) => state.rectData.rect);
   const updateRect = useRectangleStore((state) => state.update);
+  const selectedId = useRectangleStore((state) => state.selectedId);
+  const setSelectedId = useRectangleStore((state) => state.setSelectedId);
 
   const rectArray = Array.from(rectMap.values());
 
@@ -20,7 +17,8 @@ const Canvas = ({ onSelectId }: CanvasProps) => {
         <Rectangle
           key={item.id}
           {...item}
-          handleSelected={onSelectId}
+          isSelected={item.id === selectedId}
+          handleSelected={setSelectedId}
           handleDragEnd={updateRect}
           handleResizeEnd={updateRect}
         />

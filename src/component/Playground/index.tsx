@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import useRectangleStore from '../../store/rectangleStore';
 import ButtonList from '../ButtonList';
@@ -14,7 +14,8 @@ const Playground = () => {
     redo: redoRect,
   } = useRectangleStore();
 
-  const [selectId, setSelectId] = useState<number | null>(null);
+  const selectedId = useRectangleStore((state) => state.selectedId);
+  const setSelectedId = useRectangleStore((state) => state.setSelectedId);
   const totalRect = useRef(0);
 
   const onCreate = () => {
@@ -25,9 +26,9 @@ const Playground = () => {
   };
 
   const onDelete = () => {
-    if (selectId === null) return;
-    removeRect(selectId);
-    setSelectId(null);
+    if (selectedId === null) return;
+    removeRect(selectedId);
+    setSelectedId(null);
   };
 
   return (
@@ -38,7 +39,7 @@ const Playground = () => {
         onUndo={undoRect}
         onRedo={redoRect}
       />
-      <Canvas onSelectId={setSelectId} />
+      <Canvas />
     </div>
   );
 };

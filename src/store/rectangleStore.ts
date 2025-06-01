@@ -4,6 +4,8 @@ import type { Action, RectangleData, RectState } from '../types';
 
 interface RectangleStore {
   rectData: RectangleData;
+  selectedId: number | null;
+  setSelectedId: (id: number | null) => void;
   append: (item: RectState) => void;
   remove: (id: number) => void;
   update: (item: RectState) => void;
@@ -13,10 +15,10 @@ interface RectangleStore {
 
 const applyAction = (
   rectMap: Map<number, RectState>,
-  action: Action
+  action: Action,
 ): Map<number, RectState> => {
   const newMap = new Map(rectMap);
-  
+
   switch (action.type) {
     case 'append':
       newMap.set(action.item.id, action.item);
@@ -34,10 +36,10 @@ const applyAction = (
 
 const applyReverseAction = (
   rectMap: Map<number, RectState>,
-  action: Action
+  action: Action,
 ): Map<number, RectState> => {
   const newMap = new Map(rectMap);
-  
+
   switch (action.type) {
     case 'append':
       newMap.delete(action.item.id);
@@ -57,6 +59,8 @@ const useRectangleStore = create<RectangleStore>((set) => ({
     history: [],
     historyIndex: 0,
   },
+  selectedId: null,
+  setSelectedId: (id) => set({ selectedId: id }),
 
   append: (item) => {
     set((state) => {

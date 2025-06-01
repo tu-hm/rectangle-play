@@ -11,15 +11,17 @@ import type { Corner, DragRef, RectState, ResizeRef } from '../../types.ts';
 import styles from './index.module.css';
 
 type RectangleProps = RectState & {
+  isSelected: boolean,
   handleResizeEnd?: (item: RectState) => void,
   handleDragEnd?: (item: RectState) => void,
-  handleSelected?: (id: number) => void,
+  handleSelected?: (id: number | null) => void,
 };
 
 const Rectangle = ({
   id,
   x,
   y,
+  isSelected,
   width,
   height,
   backgroundColor,
@@ -35,7 +37,6 @@ const Rectangle = ({
     height,
     backgroundColor,
   });
-  const [selected, setSelected] = useState(false);
 
   const rectRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<ResizeRef | null>(null);
@@ -138,7 +139,7 @@ const Rectangle = ({
   const onDrag = (e: globalThis.MouseEvent) => {
     const drag = dragRef.current;
     if (!drag) return;
-    
+
     const dx = e.clientX - drag.px;
     const dy = e.clientY - drag.py;
 
@@ -166,9 +167,9 @@ const Rectangle = ({
       if (
         rectRef.current &&
         !rectRef.current.contains(event.target as Node) &&
-        selected
+        isSelected
       ) {
-        setSelected(false);
+        handleSelected(null);
       }
     };
 
@@ -176,11 +177,12 @@ const Rectangle = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div
-      className={clsx(styles.rectangle, selected && styles.selectecRectangle)}
+      className={clsx(styles.rectangle, isSelected && styles.selectecRectangle)}
       ref={rectRef}
       style={{
         top: `${rect.y}px`,
@@ -192,7 +194,6 @@ const Rectangle = ({
       }}
       onClick={() => {
         if (!movedRef.current && !dragRef.current && !resizeRef.current) {
-          setSelected((prev) => !prev);
           handleSelected(id);
         }
       }}
