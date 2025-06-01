@@ -1,13 +1,8 @@
-import './App.css'
-import Rectangle from "./component/Rectangle";
+import './App.css';
+import Playground from './component/Playground';
 
 function App() {
-  return (
-    <>
-      <Rectangle id={1} />
-      <Rectangle id={2} x={400} y={600}/>
-    </>
-  )
+  return <Playground />;
 }
 
-export default App
+export default App;

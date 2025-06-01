@@ -1,0 +1,27 @@
+.buttonList {
+  display: flex;
+  gap: 12px;    
+  flex-direction: column;    
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+  width: 20%;
+  padding: 0 64px;
+  border-right: 1px solid black;
+}
+
+.createButton {
+  background-color: blue;
+}
+
+.deleteButton {
+  background-color: red;
+}
+
+.undoButton {
+  background-color: purple;
+}
+
+.redoButton {
+  background-color: green;
+}

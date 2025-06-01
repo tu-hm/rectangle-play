@@ -1,48 +1,62 @@
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 import {
   useEffect,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent
-} from "react";
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 
-
-import { getRandomColor, getRandomInt } from "../../utils.ts";
-import { minHeight, minWidth } from "./constant.ts";
+import { MIN_HEIGHT, MIN_WIDTH } from '../../constant.ts';
+import type { Corner, DragRef, RectState, ResizeRef } from '../../types.ts';
 import styles from './index.module.css';
-import type { DragRef, Corner, RectState, ResizeRef } from "./types.ts";
 
-type RectangleProps = {
-  id: number;
-} & Partial<Omit<RectState, 'id'>>;
+type RectangleProps = RectState & {
+  handleResizeEnd?: (item: RectState) => void,
+  handleDragEnd?: (item: RectState) => void,
+  handleSelected?: (id: number) => void,
+};
 
 const Rectangle = ({
   id,
-  ...initialRect
+  x,
+  y,
+  width,
+  height,
+  backgroundColor,
+  handleDragEnd = () => {},
+  handleResizeEnd = () => {},
+  handleSelected = () => {},
 }: RectangleProps) => {
   const [rect, setRect] = useState<RectState>({
     id,
-    width: getRandomInt(100, 200),
-    height: getRandomInt(100, 200),
-    x: getRandomInt(100, 200),
-    y: getRandomInt(100, 200),
-    selected: false,
-    backgroundColor: getRandomColor(),
-    ...initialRect,
-  })
+    x,
+    y,
+    width,
+    height,
+    backgroundColor,
+  });
+  const [selected, setSelected] = useState(false);
 
   const rectRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<ResizeRef | null>(null);
   const dragRef = useRef<DragRef | null>(null);
-
+  const curRectRef = useRef<RectState>(rect);
+  const movedRef = useRef(false);
 
   const onMouseUp = () => {
-    resizeRef.current = null;
-    document.removeEventListener('mousemove', onResize);
-    document.removeEventListener('mouseup', onMouseUp);
-    document.removeEventListener('mousemove', onDrag);
-  };
+    const isResize = resizeRef.current !== null && movedRef.current;
+    const isDrag = dragRef.current !== null && movedRef.current;
 
+    if (isResize) handleResizeEnd(curRectRef.current);
+    else if (isDrag) handleDragEnd(curRectRef.current);
+
+    resizeRef.current = null;
+    dragRef.current = null;
+    movedRef.current = false;
+    document.removeEventListener('mousemove', onResize);
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
 
   const onMouseDownResize = (e: ReactMouseEvent, corner: Corner) => {
     e.stopPropagation();
@@ -57,48 +71,57 @@ const Rectangle = ({
       height: rect.height,
       px: e.clientX,
       py: e.clientY,
-    }
+    };
+    movedRef.current = false;
 
     document.addEventListener('mousemove', onResize);
     document.addEventListener('mouseup', onMouseUp);
-  }
+  };
 
   const onResize = (e: globalThis.MouseEvent) => {
     if (!resizeRef.current) return;
-    const {
-      corner,
-      x,
-      y,
-      px,
-      py,
-      width,
-      height
-    } = resizeRef.current;
+    const { corner, x, y, px, py, width, height } = resizeRef.current;
     const dx = e.clientX - px;
     const dy = e.clientY - py;
+
+    if (dx !== 0 || dy !== 0) movedRef.current = true;
 
     setRect((prevRect) => {
       const newRect = { ...prevRect };
 
       if (corner.includes('right')) {
-        newRect.width = Math.max(minWidth, width + dx);
+        newRect.width = Math.max(MIN_WIDTH, width + dx);
       }
       if (corner.includes('bottom')) {
-        newRect.height = Math.max(minHeight, height + dy);
+        newRect.height = Math.max(MIN_HEIGHT, height + dy);
       }
       if (corner.includes('left')) {
-        newRect.width = Math.max(minWidth, width - dx);
-        newRect.x = x + dx;
+        const calculatedWidth = width - dx;
+
+        if (calculatedWidth < MIN_WIDTH) {
+          newRect.width = MIN_WIDTH;
+          newRect.x = x + width - MIN_WIDTH;
+        } else {
+          newRect.width = calculatedWidth;
+          newRect.x = x + dx;
+        }
       }
       if (corner.includes('top')) {
-        newRect.height = Math.max(minHeight, height - dy);
-        newRect.y = y + dy;
+        const calculatedHeight = height - dy;
+        if (calculatedHeight < MIN_HEIGHT) {
+          newRect.height = MIN_HEIGHT;
+          newRect.y = y + height - MIN_HEIGHT;
+        } else {
+          newRect.height = calculatedHeight;
+          newRect.y = y + dy;
+        }
       }
 
-      return newRect;
-    })
-  }
+      curRectRef.current = newRect;
 
+      return newRect;
+    });
+  };
 
   const onMouseDownDrag = (e: ReactMouseEvent) => {
     dragRef.current = {
@@ -106,27 +129,46 @@ const Rectangle = ({
       y: rect.y,
       px: e.clientX,
       py: e.clientY,
-    }
+    };
 
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', onMouseUp);
-  }
+  };
 
   const onDrag = (e: globalThis.MouseEvent) => {
-    if(!dragRef.current) return;
-    const dx = e.clientX - dragRef.current.px;
-    const dy = e.clientY - dragRef.current.py;
-    setRect((prevRect) => ({
-      ...prevRect,
-      x: dragRef.current!.x + dx,
-      y: dragRef.current!.y + dy
-    }));
-  }
+    const drag = dragRef.current;
+    if (!drag) return;
+    
+    const dx = e.clientX - drag.px;
+    const dy = e.clientY - drag.py;
+
+    if (dx !== 0 || dy !== 0) movedRef.current = true;
+
+    setRect((prevRect) => {
+      const newRect = {
+        ...prevRect,
+        x: drag.x + dx,
+        y: drag.y + dy,
+      };
+      curRectRef.current = newRect;
+      return newRect;
+    });
+  };
+
+  useEffect(() => {
+    const newRect = { id, x, y, width, height, backgroundColor };
+    setRect(newRect);
+    curRectRef.current = newRect;
+  }, [id, x, y, width, height, backgroundColor]);
 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
-      if (rectRef.current && !rectRef.current.contains(event.target as Node)) {
-        setRect(prev => ({ ...prev, selected: false }));
+      if (
+        rectRef.current &&
+        !rectRef.current.contains(event.target as Node) &&
+        selected
+      ) {
+        setSelected(false);
       }
     };
 
@@ -134,13 +176,11 @@ const Rectangle = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [])
+  }, []);
 
   return (
     <div
-      className={
-        clsx(styles.rectangle, rect.selected && styles.selectecRectangle)
-      }
+      className={clsx(styles.rectangle, selected && styles.selectecRectangle)}
       ref={rectRef}
       style={{
         top: `${rect.y}px`,
@@ -150,12 +190,21 @@ const Rectangle = ({
         backgroundColor: rect.backgroundColor,
         zIndex: id,
       }}
-      onClick={() => setRect(prev => ({ ...prev, selected: true }))}
+      onClick={() => {
+        if (!movedRef.current && !dragRef.current && !resizeRef.current) {
+          setSelected((prev) => !prev);
+          handleSelected(id);
+        }
+      }}
       onMouseDown={onMouseDownDrag}
     >
       <div
         className={clsx(styles.pointer, styles.topLeftPointer)}
         onMouseDown={(e) => onMouseDownResize(e, 'top-left')}
+      />
+      <div
+        className={clsx(styles.pointer, styles.topRightPointer)}
+        onMouseDown={(e) => onMouseDownResize(e, 'top-right')}
       />
       <div
         className={clsx(styles.pointer, styles.bottomLeftPointer)}
@@ -165,14 +214,10 @@ const Rectangle = ({
         className={clsx(styles.pointer, styles.bottomRightPointer)}
         onMouseDown={(e) => onMouseDownResize(e, 'bottom-right')}
       />
-      <div
-        className={clsx(styles.pointer, styles.topRightPointer)}
-        onMouseDown={(e) => onMouseDownResize(e, 'top-right')}
-      />
 
       {id}
     </div>
-  )
-}
+  );
+};
 
 export default Rectangle;
