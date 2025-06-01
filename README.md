@@ -1,4 +1,4 @@
-# Rectangle Editor
+# Rectangle Playground
 
 A interactive React application that allows users to create, manipulate, and manage rectangles on a canvas with full undo/redo functionality.
 
@@ -134,7 +134,7 @@ Modern browsers supporting:
 - ES6+ features
 - CSS Grid/Flexbox
 - Mouse events
-- React 18
+- React 19
 
 ## Future Enhancements
 
