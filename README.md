@@ -1,54 +1,160 @@
-# React + TypeScript + Vite
+# Rectangle Editor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A interactive React application that allows users to create, manipulate, and manage rectangles on a canvas with full undo/redo functionality.
 
-Currently, two official plugins are available:
+![image](https://github.com/user-attachments/assets/9e9cc4a2-7c8f-4e6d-baf7-a53bcf1cafec)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Core Functionality
+- **Create Rectangles**: Generate new rectangles with random colors, positions, and sizes
+- **Delete Rectangles**: Remove selected rectangles from the canvas
+- **Drag & Drop**: Move rectangles around the canvas by dragging
+- **Resize**: Resize rectangles using corner handles when selected
+- **Selection**: Click to select/deselect rectangles with visual feedback
+- **Undo/Redo**: Full history management with undo and redo capabilities
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Interactive Controls
+- **Visual Selection**: Selected rectangles display a blue border and resize handles
+- **Resize Handles**: Four corner handles (top-left, top-right, bottom-left, bottom-right) with appropriate cursors
+- **Minimum Size Constraints**: Rectangles maintain minimum dimensions (50x50px)
+- **Click Outside to Deselect**: Automatic deselection when clicking outside rectangles
+
+## Technology Stack
+
+- **React 18** with TypeScript
+- **Zustand** for state management
+- **CSS Modules** for styling
+- **Vite** for build tooling
+- **clsx** for conditional CSS classes
+
+## Project Structure
+
+```
+src/
+├── component/
+│   ├── ButtonList/          # Control buttons (Create, Delete, Undo, Redo)
+│   ├── Canvas/              # Main drawing area
+│   ├── Playground/          # Main container component
+│   └── Rectangle/           # Individual rectangle component
+├── store/
+│   └── rectangleStore.ts    # Zustand store for state management
+├── types.ts                 # TypeScript type definitions
+├── utils.ts                 # Utility functions
+├── constant.ts              # Application constants
+└── App.tsx                  # Root component
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Key Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Rectangle Component
+- Handles mouse interactions for dragging and resizing
+- Manages selection state and visual feedback
+- Provides corner resize handles with proper cursor indicators
+- Enforces minimum size constraints during resize operations
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### ButtonList Component
+- Provides Create, Delete, Undo, and Redo buttons
+- Buttons are disabled when actions are not available
+- Each button has distinct styling for easy identification
+
+### Canvas Component
+- Renders all rectangles in a relative positioned container
+- Manages rectangle selection state
+- Handles rectangle updates from drag/resize operations
+
+### Rectangle Store (Zustand)
+- Manages rectangle state with Map-based storage
+- Implements command pattern for undo/redo functionality
+- Maintains action history for state management
+- Supports append, remove, and update operations
+
+## State Management
+
+The application uses a sophisticated state management system with:
+
+- **Rectangle Map**: Efficient storage using `Map<number, RectState>`
+- **Action History**: Array of actions for undo/redo functionality
+- **History Index**: Tracks current position in history
+- **Command Pattern**: Actions are reversible for proper undo/redo
+
+### Action Types
+- `append`: Add new rectangle
+- `remove`: Delete existing rectangle  
+- `update`: Modify rectangle properties (position, size)
+
+## Installation & Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
+
+## Usage
+
+1. **Creating Rectangles**: Click the "Create" button to add a new rectangle with random properties
+2. **Selecting Rectangles**: Click on any rectangle to select it (blue border appears)
+3. **Moving Rectangles**: Drag selected rectangles to new positions
+4. **Resizing Rectangles**: Use the corner handles on selected rectangles to resize
+5. **Deleting Rectangles**: Select a rectangle and click the "Delete" button
+6. **Undo/Redo**: Use the respective buttons to navigate through action history
+
+## Technical Highlights
+
+### Performance Optimizations
+- Efficient Map-based rectangle storage
+- Minimal re-renders through proper state management
+- Optimized event handling with proper cleanup
+
+### User Experience
+- Smooth animations and transitions
+- Intuitive mouse interactions
+- Visual feedback for all interactions
+- Proper cursor indicators for different operations
+
+### Code Quality
+- TypeScript for type safety
+- Modular component architecture
+- CSS Modules for scoped styling
+- Proper separation of concerns
+
+## Browser Compatibility
+
+Modern browsers supporting:
+- ES6+ features
+- CSS Grid/Flexbox
+- Mouse events
+- React 18
+
+## Future Enhancements
+
+Potential improvements could include:
+- Multi-selection support
+- Copy/paste functionality
+- Keyboard shortcuts
+- Export/import capabilities
+- Grid snapping
+- Color picker for rectangles
+- Layer management (z-index controls)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
